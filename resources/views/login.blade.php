@@ -340,7 +340,7 @@
             <span class="text-red-500">{{ $message }}</span>
         @enderror
         <div style="width: 65%;margin: 0 auto;" class="g-recaptcha" data-sitekey="6Leeyl4pAAAAAJ7cAyMX9Z3UKGj8Z39k9Zv3t73p" required></div>
-        @error('error')
+        @error('errors')
         <span class="text-red-500">{{ $message }}</span>
         @enderror
         <input type="submit" class="fadeIn fourth" value="registrar">
