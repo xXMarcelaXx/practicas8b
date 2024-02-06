@@ -332,29 +332,44 @@
       @csrf
         <p>Registro</p>
         <input type="text" id="name" class="fadeIn second" name="name" placeholder="Nombre" pattern="[A-Za-z\s]{4,50}" minlength="4" maxlength="50" required>
-        <p style="font-size: 12px; color: #333;">Solo letras y espacios, caracteres:4-50</p>
-        @error('name')
-        <p style="font-size: 12px; color: red;">{{ $message }}</p>
-        @enderror
-        <input type="email" id="email" class="fadeIn third" name="email" placeholder="Correo" required>
-        @error('email')
-        <p style="font-size: 12px; color: red;">{{ $message }}</p>
-        @enderror
+        <p style="font-size: 12px; color: #333;">Solo letras y espacios, caracteres:4-50</p><br>
+        <small class="form-text text-danger">
+        @if($errors->has('name'))
+        {{$errors->first('name')}}
+        @endif
+        </small>
+        <input type="email" id="email" class="fadeIn third" name="email" placeholder="Correo" required><br>
+        <small class="form-text text-danger">
+        @if($errors->has('email'))
+        {{$errors->first('email')}}
+        @endif
+        </small>
         <input type="text" id="telefono" class="fadeIn third" name="telefono" placeholder="Telefono" pattern="[0-9]*" inputmode="numeric" maxlength="10" required>
-        <p style="font-size: 12px; color: #333;">Solo 10 numeros</p>
-        @error('telefono')
-        <p style="font-size: 12px; color: red;">{{ $message }}</p>
-        @enderror
+        <p style="font-size: 12px; color: #333;">Solo 10 numeros</p><br>
+        <small class="form-text text-danger">
+        @if($errors->has('telefono'))
+        {{$errors->first('telefono')}}
+        @endif
+        </small>
         <input type="password" id="password" class="fadeIn third" name="password" placeholder="Contraseña" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z0-9]{10,16}$" maxlength="16" minlength="10" required>
         <p style="font-size: 12px; color: #333;">Al menos 1 mayuscula 1 minuscula 1 numero, sin caracteres especiales, caracteres:10-16</p>
-        @error('password')
-        <p style="font-size: 12px; color: red;">{{ $message }}</p>
-        @enderror
-        <div style="width: 65%;margin: 0 auto;" class="g-recaptcha" data-sitekey="6Leeyl4pAAAAAJ7cAyMX9Z3UKGj8Z39k9Zv3t73p" required></div>
-        @error('errors')
-        <p style="font-size: 12px; color: red;">{{ $message }}</p>
-        @enderror
+        <small class="form-text text-danger">
+        @if($errors->has('password'))
+        {{$errors->first('password')}}
+        @endif
+        </small>
+        <div style="width: 65%;margin: 0 auto;" class="g-recaptcha" data-sitekey="6Leeyl4pAAAAAJ7cAyMX9Z3UKGj8Z39k9Zv3t73p" required></div><br>
+        @if ($errors->any())
+        <div >
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li style="font-size: 12px; color: red;">{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
         <input type="submit" class="fadeIn fourth" value="registrar">
+
       </form>
 
       <script>

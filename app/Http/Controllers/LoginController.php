@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
+
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\VerificarCorreo;
@@ -16,10 +16,10 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Redirect;
-
+use Illuminate\Http\Request;
 use PDOException;
 use Exception;
-
+use Illuminate\Support\Facades\Redis;
 
 class LoginController extends Controller
 {
@@ -64,8 +64,8 @@ class LoginController extends Controller
 
             if ($validacion->fails()) {
                 return redirect('registro')
-                    ->withErrors($validacion)
-                    ->withInput();
+                    ->withInput()
+                    ->withErrors($validacion);
             }
 
             //Agregar usuario admin o visitante
@@ -139,6 +139,7 @@ class LoginController extends Controller
 
             if ($validacion->fails()) {
                 return redirect('iniciarSesion')
+                    ->withInput()
                     ->withErrors($validacion);
             }
 
@@ -153,7 +154,7 @@ class LoginController extends Controller
 
                     return view('mandarSMS')->with('url', $url);
                 }
-                $message = 'Se logeo un usuario visitante con id: '. $user->id;
+                $message = 'Se logeo un usuario visitante con id: ' . $user->id;
                 Log::info($message);
                 $request->session()->regenerate();
                 return redirect()->route('index', ['id' => $user->id]);
@@ -204,7 +205,6 @@ class LoginController extends Controller
                 return view('validarSMS')->with('request_id', $response->object('request')->request_id)->with('id', $user->id);
             }
             return abort(401);
-            
         } catch (QueryException $e) {
             // Manejo de la excepción de consulta SQL
             Log::error('Error de consulta SQL: ' . $e->getMessage());
@@ -240,7 +240,7 @@ class LoginController extends Controller
                 ]
             );
             if ($response->ok()) {
-                $message = 'Inicio sesion un usuario administrador con id: '.$user->id;
+                $message = 'Inicio sesion un usuario administrador con id: ' . $user->id;
                 Log::info($message);
                 $request->session()->regenerate();
                 return redirect()->route('index', ['id' => $user->id]);
@@ -277,4 +277,81 @@ class LoginController extends Controller
         return redirect('iniciarSesion');
     }
 
+
+    public function formulario()
+    {
+        return view('log2');
+    }
+
+
+    public function guardar(Request $request){
+        $validacion = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'password' => 'required'
+        ]);
+        log::info($validacion->getMessageBag());
+        if ($validacion->fails()) {
+            return redirect('/formulario')
+                ->withInput()
+                ->withErrors($validacion);
+        }
+
+        return response()->json([
+            "Status" => 403,
+            "msg" => "No jala el pto validator:(",
+        ], 403);
+    }
+  /*  public function guardar(Request $request)
+    {
+        try {
+
+            $validacion = Validator::make($request->all(), [
+                'email' => 'required|email',
+                'password' => 'required'
+            ]);
+            log::info($validacion->getMessageBag());
+            if ($validacion->fails()) {
+                return redirect('/formulario')
+                    ->withInput()
+                    ->withErrors($validacion);
+            }
+
+            if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+                $user = User::where("email", "=", $request->email)->first();
+                if ($user->hasRole('admin')) {
+
+                    $url = URL::temporarySignedRoute('mandarSMS', now()->addMinutes(10), [
+                        'id' => $user->id
+                    ]);
+
+                    return view('mandarSMS')->with('url', $url);
+                }
+                $message = 'Se logeo un usuario visitante con id: ' . $user->id;
+                Log::info($message);
+                $request->session()->regenerate();
+                return redirect()->route('index', ['id' => $user->id]);
+            } else {
+                log::warning('no esta entrando al validator');
+                return redirect('iniciarSesion')->withErrors(['errors' => 'Las credenciales proporcionadas son incorrectas.']);
+            }
+        } catch (ValidationException $e) {
+            $errors = $e->validator->errors()->all();
+            $errorsString = implode(', ', $errors);
+            Log::error('Error de consulta SQL: ' . $e->getMessage());
+
+            return Redirect::back()->withErrors(['errors' => 'Error interno del servidor. Por favor, inténtelo de nuevo más tarde.']);
+        } catch (QueryException $e) {
+            // Manejo de la excepción de consulta SQL
+            Log::error('Error de consulta SQL: ' . $e->getMessage());
+            return Redirect::back()->withErrors(['errors' => 'Error interno del servidor. Por favor, inténtelo de nuevo más tarde.']);
+        } catch (PDOException $e) {
+            // Manejo de la excepción de PDO
+            Log::error('Error de PDO: ' . $e->getMessage());
+            return Redirect::back()->withErrors(['errors' => 'Error interno del servidor. Por favor, inténtelo de nuevo más tarde.']);
+        } catch (Exception $e) {
+            // Manejo de cualquier otra excepción no prevista
+            Log::error('Excepción no controlada: ' . $e->getMessage());
+            return Redirect::back()->withErrors(['errors' => 'Error interno del servidor. Por favor, inténtelo de nuevo más tarde.']);
+        }
+    }*/
 }

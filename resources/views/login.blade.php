@@ -331,18 +331,28 @@
       <form method="POST" action="{{route('login')}}" onsubmit="return validarRecaptcha()">
       @csrf
         <p>Login</p>
-        <input type="email" id="email" class="fadeIn third" name="email" placeholder="Correo" required>
-        @error('email')
-            <span class="text-red-500">{{ $message }}</span>
-        @enderror
-        <input type="password" id="password" class="fadeIn third" name="password" placeholder="Contraseña"  required>
-        @error('password')
-            <span class="text-red-500">{{ $message }}</span>
-        @enderror
-        <div style="width: 65%;margin: 0 auto;" class="g-recaptcha" data-sitekey="6Leeyl4pAAAAAJ7cAyMX9Z3UKGj8Z39k9Zv3t73p" required></div>
-        @error('errors')
-        <span class="text-red-500">{{ $message }}</span>
-        @enderror
+        <input type="email" id="email" class="fadeIn third" name="email" placeholder="Correo"  required><br>
+        <small class="form-text text-danger">
+        @if($errors->has('email'))
+        {{$errors->first('email')}}
+        @endif
+        </small>
+        <input type="password" id="password" class="fadeIn third" name="password" placeholder="Contraseña"  required><br>
+        <small class="form-text text-danger">
+        @if($errors->has('password'))
+        {{$errors->first('password')}}
+        @endif
+        </small>
+        <div style="width: 65%;margin: 0 auto;" class="g-recaptcha" data-sitekey="6Leeyl4pAAAAAJ7cAyMX9Z3UKGj8Z39k9Zv3t73p" required></div><br>
+        @if ($errors->any())
+        <div >
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li style="font-size: 12px; color: red;">{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
         <input type="submit" class="fadeIn fourth" value="registrar">
       </form>
 

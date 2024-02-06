@@ -38,3 +38,8 @@ Route::post('/validar-codigo',[LoginController::class, 'validarCodigo'])->name('
 Route::post('/registrar-usuario', [LoginController::class, 'registrarUsuario'])->name('registrar-usuario');
 
 
+
+ Route::get('/formulario', [LoginController::class, 'formulario'])->name('formulario');
+Route::post('/guardar', [LoginController::class, 'guardar'])->name('guardar');
+   // Tus rutas aquí
+
